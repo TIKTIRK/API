@@ -40,11 +40,12 @@ class News{
         $res->bindParam(":date", $this->date);
         $res->bindParam(":tags", $this->tags);
         $res->bindParam(":author", $this->author);
-
-        if($res->execute()){
-            return true;
-        }
-        return false;
+        $res->execute();
+        
+        $query_output = "SELECT * FROM `news_list` ORDER BY id DESC LIMIT 1;";
+        $res_output = $this->con->prepare($query_output);
+        $res_output->execute();
+        return $res_output;
     }
 
     function delete(){
@@ -65,19 +66,23 @@ class News{
         $date=$this->date;
         $tags=$this->tags;
         $author=$this->author;
-        if($this->title!=NULL){$update.="title=$title";}
-        if($this->description!=NULL && $update!=""){$update.=", description=$description";}elseif($this->description!=NULL){$update.="description=$description";}
-        if($this->text!=NULL && $update!=""){$update.=", text=$text";}elseif($this->text!=NULL){$update.="text=$text";}
-        if($this->date!=NULL && $update!=""){$update.=", date=$date";}elseif($this->date!=NULL){$update.="date=$date";}
-        if($this->tags!=NULL && $update!=""){$update.=", tags=$tags";}elseif($this->tags!=NULL){$update.="tags=$tags";}
-        if($this->author!=NULL && $update!=""){$update.=", author=$author";}elseif($this->author!=NULL){$update.="author=$author";}
+        if($this->title!=NULL){$update.="title='$title'";}
+        if($this->description!=NULL && $update!=""){$update.=", description='$description'";}elseif($this->description!=NULL){$update.="description='$description'";}
+        if($this->text!=NULL && $update!=""){$update.=", text='$text'";}elseif($this->text!=NULL){$update.="text='$text'";}
+        if($this->date!=NULL && $update!=""){$update.=", date='$date'";}elseif($this->date!=NULL){$update.="date='$date'";}
+        if($this->tags!=NULL && $update!=""){$update.=", tags='$tags'";}elseif($this->tags!=NULL){$update.="tags='$tags'";}
+        if($this->author!=NULL && $update!=""){$update.=", author='$author'";}elseif($this->author!=NULL){$update.="author='$author'";}
         $query = "UPDATE `news_list` SET $update WHERE id = :id";
         
         $res = $this->con->prepare($query);
         $res->bindParam(":id", $this->id);
-        var_dump($res);
+
+        $query_output = "SELECT * FROM `news_list` WHERE id = :id";
+        $res_output = $this->con->prepare($query_output);
+        $res_output->bindParam(":id", $this->id);
+        $res_output->execute();
         if($res->execute()){
-            return true;
+            return $res_output;
         }
       
         return false;
